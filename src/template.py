@@ -9,9 +9,9 @@ Usage: slicer --no-main-window --python-script path/to/template.py
     
 Author: YingLi Lu, yinglilu@gmail.com
 
-Date: 2017-06-21
+Date: 2017-07-20
 
-Note: tested with slicer 4.6.2
+Note: tested with slicer nigtly build 2017-07-20: Expose enter()/exit() to python scripting
 
 """
 
@@ -19,10 +19,10 @@ Note: tested with slicer 4.6.2
 saveData=True
 
 #True: show 'Modules Search'. Selected module will be added to modules tab dynamically.
-addModule=True
+addModule=False
 
 #Modify/add modules you need
-defaultModules=["data"]
+defaultModules=["markups"]
 
 #slicer 2D/3D layout: pick up a number
 slicerLayout = 2
@@ -81,7 +81,11 @@ import __main__
 
 def onModuleSelected(modulename):
   global tabWidget
-  tabWidget.addTab(getattr(slicer.modules, modulename.lower()).widgetRepresentation(), modulename)
+  widgetRepresentation = getattr(slicer.modules, modulename.lower()).createNewWidgetRepresentation()
+  widgetRepresentation.setMRMLScene(slicer.app.mrmlScene())
+  #print(widgetRepresentation)
+  tabWidget.addTab(widgetRepresentation, modulename)
+  widgetRepresentation.enter() #update the panel
 
 #splitter
 splitter = qt.QSplitter()
